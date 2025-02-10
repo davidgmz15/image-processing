@@ -7,7 +7,6 @@
 // EFFECTS:  Initializes *mat as a Matrix with the given width and height,
 //           with all elements initialized to 0.
 void Matrix_init(Matrix* mat, int width, int height) {
-  assert(0 < width && 0 < height);
   mat->width = width;
   mat->height = height;
 
@@ -55,9 +54,6 @@ int Matrix_height(const Matrix* mat) {
 // EFFECTS:  Returns a pointer to the element in the Matrix
 //           at the given row and column.
 int* Matrix_at(Matrix* mat, int row, int column) {
-  assert(0 <= row && row < mat->height);
-  assert(0 <= column && column < mat->width);
-
   return &mat->data[(row * mat->width) + column];
 }
 
@@ -68,9 +64,6 @@ int* Matrix_at(Matrix* mat, int row, int column) {
 // EFFECTS:  Returns a pointer-to-const to the element in
 //           the Matrix at the given row and column.
 const int* Matrix_at(const Matrix* mat, int row, int column) {
-  assert(0 <= row && row < mat->height);
-  assert(0 <= column && column < mat->width);
-
   return &mat->data[(row * mat->width) + column];
 }
 
@@ -131,10 +124,6 @@ int Matrix_max(const Matrix* mat) {
 //           the leftmost one.
 int Matrix_column_of_min_value_in_row(const Matrix* mat, int row,
                                       int column_start, int column_end) {
-  assert(0 <= row && row < mat->height);
-  assert(0 <= column_start && column_end <= mat->width);
-  assert(column_start < column_end);
-
   int min_col = column_start;
   int min_val = *Matrix_at(mat, row, column_start);
   for (int i = 0; i < mat->width; i++) {
@@ -156,10 +145,6 @@ int Matrix_column_of_min_value_in_row(const Matrix* mat, int row,
 //           column_start (inclusive) and column_end (exclusive).
 int Matrix_min_value_in_row(const Matrix* mat, int row,
                             int column_start, int column_end) {
-  assert(0 <= row && row < mat->height);
-  assert(0 <= column_start && column_end <= mat->width);
-  assert(column_start < column_end);
-
   int min_val = *Matrix_at(mat, row, column_start);
   for (int j = column_start + 1; j < column_end; j++) {
     int curr_val = *Matrix_at(mat, row, j);

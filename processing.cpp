@@ -86,10 +86,30 @@ static int squared_difference(Pixel p1, Pixel p2) {
 //           image is computed and written into it.
 //           See the project spec for details on computing the energy matrix.
 void compute_energy_matrix(const Image* img, Matrix* energy) {
-  assert(false); // TODO Replace with your implementation!
-  assert(squared_difference(Pixel(), Pixel())); // TODO delete me, this is here to make it compile
+  for (int i = 0; i < img->height; i++) {
+    for (int j = 0; j < img->width; j++) {
+      Matrix_init(energy, i, j);
+    }
+  }
+  int max_energy = 0;
+  int curr_energy;
+  for (int i = 0; i < img->height - 1; i++) {
+    for (int j = 0; j < img->width - 1; j++) {   
+      Pixel x = Image_get_pixel(img, i, j);
+      Pixel w = Image_get_pixel(img, i, j - 1);
+      Pixel e = Image_get_pixel(img, i, j + 1);
+      Pixel n = Image_get_pixel(img, i - 1, j);
+      Pixel s = Image_get_pixel(img, i + 1, j);
+      int sd_energy = squared_difference(w, e) + squared_difference(n, s); 
+      *Matrix_at(energy, i, j) = sd_energy;
+      if (sd_energy > max_energy) {
+        max_energy = sd_energy;
+      }
+    }
+  }
+  Matrix_fill_border(energy, max_energy);
 }
-
+//int max_Energy = Matrix_max(energy);    and might be Matrix_fill_border(energy, max_Energy)
 
 // REQUIRES: energy points to a valid Matrix.
 //           cost points to a Matrix.

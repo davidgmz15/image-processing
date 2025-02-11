@@ -14,9 +14,9 @@ void Image_init(Image* img, int width, int height) {
   img->width = width;
   img->height = height;
   
-  Matrix_init(&img->red_channel, height, width);
-  Matrix_init(&img->green_channel, height, width);
-  Matrix_init(&img->blue_channel, height, width);
+  Matrix_init(&img->red_channel, width, height);
+  Matrix_init(&img->green_channel, width, height);
+  Matrix_init(&img->blue_channel, width, height);
 }
 
 // REQUIRES: img points to an Image
@@ -28,23 +28,26 @@ void Image_init(Image* img, int width, int height) {
 // NOTE:     See the project spec for a discussion of PPM format.
 void Image_init(Image* img, std::istream& is) {
   string helper;
-  getline(is, helper);
+  is >> helper;
+  assert(helper == "P3");  // Ensure correct format
 
-  int height;
-  int width;
-  is >> height >> width;
+  int width, height;
+  is >> width >> height;
+  assert(width > 0 && height > 0);
 
-  getline(is, helper);
-  Image_init(img, height, width);
+  is >> helper;
+  assert(helper == "255");  // Ensure max color value is 255
+
+  // Reinitialize the image to avoid memory issues
+  Image_init(img, width, height);
 
   int red, green, blue;
-
   for (int i = 0; i < height; i++) {
     for (int j = 0; j < width; j++) {
-    is >> red >> green >> blue;
-    *Matrix_at(&img->red_channel, i, j) = red;
-    *Matrix_at(&img->green_channel, i, j) = green;
-    *Matrix_at(&img->blue_channel, i, j) = blue;
+      is >> red >> green >> blue;
+      *Matrix_at(&img->red_channel, i, j) = red;
+      *Matrix_at(&img->green_channel, i, j) = green;
+      *Matrix_at(&img->blue_channel, i, j) = blue;
     }
   }
 }
@@ -124,7 +127,7 @@ void Image_set_pixel(Image* img, int row, int column, Pixel color) {
 // EFFECTS:  Sets each pixel in the image to the given color.
 void Image_fill(Image* img, Pixel color) {
   for (int i = 0; i < img->height; i++) {
-    for (int j = 0; i < img->width; j++) {
+    for (int j = 0; j < img->width; j++) {
       Image_set_pixel(img, i, j, color);
     }
   }

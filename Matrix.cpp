@@ -126,7 +126,7 @@ int Matrix_column_of_min_value_in_row(const Matrix* mat, int row,
                                       int column_start, int column_end) {
   int min_col = column_start;
   int min_val = *Matrix_at(mat, row, column_start);
-  for (int i = 0; i < mat->width; i++) {
+  for (int i = column_start; i <= column_end; i++) {
     int curr_val = *Matrix_at(mat, row, i);
     if (curr_val < min_val) {
       min_val = curr_val;

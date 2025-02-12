@@ -8,12 +8,12 @@ CXX ?= g++
 CXXFLAGS ?= --std=c++17 -Wall -Werror -pedantic -g -Wno-sign-compare -Wno-comment
 
 # Set the following to true to build with JPEG support
-USE_LIBJPEG ?=
+USE_LIBJPEG ?= true
 
 # If necessary, set the following to the location of your
 # libjpeg/libjpeg-turbo installation,
 # e.g. LIBJPEG_PATH ?= /opt/homebrew/Cellar/jpeg-turbo/3.0.2
-LIBJPEG_PATH ?=
+LIBJPEG_PATH ?= /opt/homebrew/Cellar/jpeg-turbo/3.1.0
 
 ifeq "$(strip $(USE_LIBJPEG))" "true"
 	export LIBJPEG_CXXFLAGS := -DJPEG_HPP_USE_LIBJPEG

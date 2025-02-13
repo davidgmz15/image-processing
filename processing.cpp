@@ -1,5 +1,6 @@
 #include <cassert>
 #include <vector>
+#include <climits>
 #include "processing.hpp"
 
 using namespace std;
@@ -22,7 +23,8 @@ void rotate_left(Image* img) {
   // iterate through pixels and place each where it goes in temp
   for (int r = 0; r < height; ++r) {
     for (int c = 0; c < width; ++c) {
-      Image_set_pixel(&aux, width - 1 - c, r, Image_get_pixel(img, r, c));
+      Image_set_pixel(&aux, width - 1 - c, r,
+         Image_get_pixel(img, r, c));
     }
   }
 
@@ -49,7 +51,8 @@ void rotate_right(Image* img){
   // iterate through pixels and place each where it goes in temp
   for (int r = 0; r < height; ++r) {
     for (int c = 0; c < width; ++c) {
-      Image_set_pixel(&aux, c, height - 1 - r, Image_get_pixel(img, r, c));
+      Image_set_pixel(&aux, c, height - 1 - r, 
+        Image_get_pixel(img, r, c));
     }
   }
 
@@ -96,8 +99,10 @@ void compute_energy_matrix(const Image* img, Matrix* energy) {
 
  for (int i = 1; i < height - 1; i++) {
   for (int j = 1; j < width - 1; j++) {
-    int NS = squared_difference(Image_get_pixel(img, i - 1, j), Image_get_pixel(img, i + 1, j));
-    int WE = squared_difference(Image_get_pixel(img, i, j - 1), Image_get_pixel(img, i, j + 1));
+    int NS = squared_difference(Image_get_pixel(img, i - 1, j), 
+    Image_get_pixel(img, i + 1, j));
+    int WE = squared_difference(Image_get_pixel(img, i, j - 1), 
+    Image_get_pixel(img, i, j + 1));
     *Matrix_at(energy, i, j) =  NS + WE;
     }
   }
@@ -164,20 +169,24 @@ vector<int> find_minimal_vertical_seam(const Matrix* cost) {
   int width = Matrix_width(cost);
   int height = Matrix_height(cost);
   vector<int> min_path(height);
-  int start_col = Matrix_column_of_min_value_in_row(cost, height - 1, 0, width);
+  int start_col = Matrix_column_of_min_value_in_row
+  (cost, height - 1, 0, width);
   min_path[height - 1] = start_col;
 
   for (int i = height - 2; i >= 0; i--) {
     int col = min_path[i + 1];
 
     if (col > 0 && col < width - 1) {
-      min_path[i] = Matrix_column_of_min_value_in_row(cost, i, col - 1, col + 2);
+      min_path[i] = Matrix_column_of_min_value_in_row
+      (cost, i, col - 1, col + 2);
     }
     else if (col == 0) {
-      min_path[i] = Matrix_column_of_min_value_in_row(cost, i, col, col + 2);
+      min_path[i] = Matrix_column_of_min_value_in_row
+      (cost, i, col, col + 2);
     }
     else if (col == width - 1) {
-      min_path[i] = Matrix_column_of_min_value_in_row(cost, i, col - 1, col);
+      min_path[i] = Matrix_column_of_min_value_in_row
+      (cost, i, col - 1, col);
     }
   }
   return min_path;

@@ -36,7 +36,8 @@ int main(int argc, char* argv[]) {
     new_height = input_img.height;
   }
 
-  if (new_width <= 0 || new_width > input_img.width || new_height <= 0 || new_height > input_img.height)
+  if (new_width <= 0 || new_width > input_img.width || new_height <= 0 
+    || new_height > input_img.height)
   {
     cout << "Usage: resize.exe IN_FILENAME OUT_FILENAME WIDTH [HEIGHT]\n"
          << "WIDTH and HEIGHT must be less than or equal to original" << endl;

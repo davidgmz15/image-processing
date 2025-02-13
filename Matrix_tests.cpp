@@ -1,9 +1,12 @@
 #include "Matrix.hpp"
 #include "Matrix_test_helpers.hpp"
 #include "unit_test_framework.hpp"
+#include <climits>
+#include <sstream>
+#include <assert.h>
+
 
 using namespace std;
-
 
 // Here's a free test for you! Model yours after this one.
 // Test functions have no interface and thus no RMEs, but
@@ -12,270 +15,182 @@ using namespace std;
 // Fills a 3x5 Matrix with a value and checks
 // that Matrix_at returns that value for each element.
 TEST(test_fill_basic) {
-  Matrix *mat = new Matrix; // create a Matrix in dynamic memory
-
+  Matrix mat;
   const int width = 3;
   const int height = 5;
   const int value = 42;
-  Matrix_init(mat, 3, 5);
-  Matrix_fill(mat, value);
+  Matrix_init(&mat, 3, 5);
+  Matrix_fill(&mat, value);
 
   for(int r = 0; r < height; ++r){
     for(int c = 0; c < width; ++c){
-      ASSERT_EQUAL(*Matrix_at(mat, r, c), value);
+      ASSERT_EQUAL(*Matrix_at(&mat, r, c), value);
     }
   }
-
-  delete mat; // delete the Matrix
 }
 
 // ADD YOUR TESTS HERE
-// You are encouraged to use any functions from Matrix_test_helpers.h as needed.
-TEST(test_fill_border) {
-  Matrix *mat = new Matrix;
-  Matrix *correct_mat = new Matrix;
+// You are encouraged to use any functions from Matrix_test_helpers.hpp as needed.
 
-  const int width = 3;
-  const int height = 3;
-  const int in_value = 1;
-  const int per_value = 2;
-
-  //Matrix to test
-  Matrix_init(mat, width, height);
-  Matrix_fill(mat, in_value);
-  Matrix_fill_border(mat, per_value);
-
-  //Matrix correct. Set all values equal to per_value
-  Matrix_init(correct_mat, width, height);
-  Matrix_fill(correct_mat, per_value);
-  int * const ptr_mid = Matrix_at(correct_mat, 1, 1);
-  *ptr_mid = in_value;
-
-  ASSERT_TRUE(Matrix_equal(mat, correct_mat));
-
-  delete mat;
-  delete correct_mat;
+TEST(test_matrix_print) {
+  Matrix mat;
+  Matrix_init(&mat, 1, 1);
+  mat.data.resize(mat.width * mat.height);
+  *Matrix_at(&mat, 0, 0) = 42;
+  ostringstream expected;
+  expected << "1 1\n"
+           << "42 \n";
+  ostringstream actual;
+  Matrix_print(&mat, actual);
+  ASSERT_EQUAL(expected.str(), actual.str());
 }
 
-TEST(Matrix_test_width) {
-  Matrix *mat = new Matrix;
-  Matrix *mat2 = new Matrix;
-  Matrix *mat3 = new Matrix;
+TEST(test_matrix_width) {
+  Matrix mat;
+  mat.width = 10;
+  mat.height = 1;
 
-  Matrix_init(mat, 3,3);
-  Matrix_init(mat2, 1,1);
-  Matrix_init(mat3, 34,24); 
-  
-  ASSERT_EQUAL(Matrix_width(mat), 3);
-  ASSERT_EQUAL(Matrix_width(mat2), 1);
-  ASSERT_EQUAL(Matrix_width(mat3), 34);
-  
-  delete mat;
-  delete mat2;
-  delete mat3;
+  int width = Matrix_width(&mat);
+
+  assert(width == 10);
 }
 
-TEST(Matrix_test_height) {
-  Matrix *mat = new Matrix;
-  Matrix *mat2 = new Matrix;
-  Matrix *mat3 = new Matrix;
+TEST(test_matrix_height) {
+  Matrix mat;
+  mat.width = 1;
+  mat.height = 15;
 
-  Matrix_init(mat, 3,9);
-  Matrix_init(mat2, 1,1);
-  Matrix_init(mat3, 500,500); 
-  
-  ASSERT_EQUAL(Matrix_height(mat), 9);
-  ASSERT_EQUAL(Matrix_height(mat2), 1);
-  ASSERT_EQUAL(Matrix_height(mat3), 500);
-  
-  delete mat;
-  delete mat2;
-  delete mat3;
+  int height = Matrix_height(&mat);
+
+  assert(height == 15);
 }
 
-TEST(test_Matrix_column_of_min_value_in_row){
-  //Standard Test
-  Matrix *testMat = new Matrix;
+TEST(test_matrix_at) {
+  Matrix mat;
+  mat.width = 10;
+  mat.height = 10;
+  mat.data.resize(mat.width * mat.height);
   
-  const int width = 3;
-  const int height = 3;
-  const int in_value = 1;
-  const int per_value = 2;
-
-  Matrix_init(testMat, width, height);
-  Matrix_fill(testMat, in_value);
-  Matrix_fill_border(testMat, per_value);
-  //Test standard
-  int testColumn = Matrix_column_of_min_value_in_row(testMat, 1, 0, 3);
-  ASSERT_EQUAL(testColumn, 1);
-  delete testMat;
+  mat.data[55] = 10;
+  ASSERT_EQUAL(*Matrix_at(&mat, 5, 5), 10);
 }
 
-TEST(test_Matrix_column_of_min_value_in_row_EDGE) {
-  //ALL VALS EQUAL
-  Matrix *testMat = new Matrix;
-  
-  const int width = 3;
-  const int height = 3;
-  const int in_value = 1;
+TEST(test_matrix_fill) {
+  Matrix mat;
+  int value = 10;
+  int height = mat.height = 8;
+  int width = mat.width = 8;
+  mat.data.resize(mat.width * mat.height);
+  for (int i = 0; i < height * width; i++) {
+      mat.data[i] = 0;
+  }
+  Matrix_fill(&mat, value);
 
-  Matrix_init(testMat, width, height);
-  Matrix_fill(testMat, in_value);
-  //Test standard
-  int testColumn = Matrix_column_of_min_value_in_row(testMat, 1, 0, 3);
-  ASSERT_EQUAL(testColumn, 0);
-  delete testMat;
+  for (int i = 0; i < height * width; i++) {
+    ASSERT_EQUAL(mat.data[i], value);
+  }
 }
 
-TEST(test_Matrix_min_value_in_row) {
-    //Standard Test
-  Matrix *testMat = new Matrix;
-  
-  const int width = 3;
-  const int height = 3;
-  const int in_value = 1;
-  const int per_value = 2;
+TEST(test_matrix_fill_boarder) {
+  Matrix mat;
+  int height = mat.height = 4;
+  int width = mat.width = 4;
+  mat.data.resize(mat.width * mat.height);
 
-  Matrix_init(testMat, width, height);
-  Matrix_fill(testMat, in_value);
-  Matrix_fill_border(testMat, per_value);
-  //Test standard
-  int testMin = Matrix_min_value_in_row(testMat, 1, 0, 3);
-  ASSERT_EQUAL(testMin, 1);
-  delete testMat;
+  for (int i = 0; i < height * width; i++) {
+      mat.data[i] = 0;
+  }
+  int border = 16;
+  Matrix_fill_border(&mat, border);
+
+  for (int j = 0; j < width; j++) {
+      ASSERT_EQUAL(*Matrix_at(&mat, 0, j), border);
+  }
+  
+  for (int j = 0; j < width; j++) {
+      ASSERT_EQUAL(*Matrix_at(&mat, height - 1, j), border);
+  }
+  
+  for (int i = 1; i < height - 1; i++) {
+      ASSERT_EQUAL(*Matrix_at(&mat, i, 0), border);
+      ASSERT_EQUAL(*Matrix_at(&mat, i, width - 1), border);
+  }
+  
+  for (int i = 1; i < height - 1; i++) {
+      for (int j = 1; j < width - 1; j++) {
+          ASSERT_EQUAL(*Matrix_at(&mat, i, j), 0);
+      }
+  }
 }
 
-TEST(test_Matrix_min_value_in_row_EDGE1) {
-  //EDGE Test for all equal
-  Matrix *testMat = new Matrix;
-  
-  const int width = 3;
-  const int height = 3;
-  const int in_value = 1;
 
-  Matrix_init(testMat, width, height);
-  Matrix_fill(testMat, in_value);
-  //Test standard
-  int testMin = Matrix_min_value_in_row(testMat, 1, 0, 3);
-  ASSERT_EQUAL(testMin, 1);
-  delete testMat;
+TEST(test_matrix_max) {
+  Matrix mat;
+  mat.height = 4;
+  mat.width = 4;
+  mat.data.resize(mat.width * mat.height);
+
+  mat.data[0] = 4;
+  mat.data[1] = 2;
+  mat.data[2] = 3;
+  mat.data[3] = 5;
+  mat.data[4] = 9;
+  mat.data[5] = 7;
+  mat.data[6] = 1;
+  mat.data[7] = 6;
+  mat.data[8] = 8;
+
+  int max_value = Matrix_max(&mat);
+  ASSERT_EQUAL(max_value, 9);
 }
 
-TEST(test_Matrix_min_value_in_row_2) {
-  //Test for corner values equal as min
-  //{1, 2, 1} -> 1 should return
-  //Making sure we can skip over middle
-  Matrix *testMat = new Matrix;
-  
-  const int width = 3;
-  const int height = 3;
-  const int in_value = 2;
-  const int per_value = 1;
 
-  Matrix_init(testMat, width, height);
-  Matrix_fill(testMat, in_value);
-  Matrix_fill_border(testMat, per_value);
-  //Test standard
-  int testMin = Matrix_min_value_in_row(testMat, 1, 0, 3);
-  ASSERT_EQUAL(testMin, 1);
-  delete testMat;
+TEST(test_matrix_column_of_min_value_in_row) {
+  Matrix mat;
+    mat.height = 4;
+    mat.width = 4;
+    mat.data.resize(mat.width * mat.height);
+    // Initialize all elements to a default value.
+    for (int i = 0; i < mat.height * mat.width; i++) {
+         mat.data[i] = 10; // Arbitrary default value.
+    }
+    int start = mat.width;
+    mat.data[start + 0] = 2;
+    mat.data[start + 1] = 1;
+    mat.data[start + 2] = 3;
+    mat.data[start + 3] = 1;
+
+    int min_col = Matrix_column_of_min_value_in_row(&mat, 1, 1, 3);
+    ASSERT_EQUAL(min_col, 1);
+
+    min_col = Matrix_column_of_min_value_in_row(&mat, 1, 0, 4);
+    ASSERT_EQUAL(min_col, 1);
+
+    min_col = Matrix_column_of_min_value_in_row(&mat, 1, 0, 2);
+    ASSERT_EQUAL(min_col, 1);
 }
 
-TEST(test_matrix_print){
-  Matrix *mat = new Matrix;
-  Matrix_init(mat, 3, 3);
-  Matrix_fill(mat, 0);
-  Matrix_fill_border(mat, 1);
-  ostringstream output;
-  ostringstream output_correct;
-  Matrix_print(mat, output);
-  
- 
-  output_correct << "3 3\n" << "1 1 1 \n" << "1 0 1 \n";
-  output_correct << "1 1 1 \n";
-  
-  ASSERT_EQUAL(output.str(), output_correct.str());
+TEST(test_matrix_min_value_in_row) {
+  Matrix mat;
+    mat.height = 4;
+    mat.width = 4;
+    mat.data.resize(mat.width * mat.height);
+    // Initialize all elements to a default value.
+    for (int i = 0; i < mat.height * mat.width; i++) {
+         mat.data[i] = 10; // Arbitrary default value.
+    }
+  int start = mat.width;
+  mat.data[start + 0] = 2;
+  mat.data[start + 1] = 1;
+  mat.data[start + 2] = 3;
+  mat.data[start + 3] = 1;
 
-  delete mat;
+  ASSERT_EQUAL(Matrix_min_value_in_row(&mat, 1, 0, 4), 1);
+  ASSERT_EQUAL(Matrix_min_value_in_row(&mat, 1, 0, 2), 1);
+  ASSERT_EQUAL(Matrix_min_value_in_row(&mat, 1, 1, 4), 1);
+  ASSERT_EQUAL(Matrix_min_value_in_row(&mat, 1, 3, 4), 1);
 }
 
-TEST(test_Matrix_max) {
-  Matrix *testMat = new Matrix;
-
-  const int width = 3;
-  const int height = 3;
-  const int in_value = 2;
-  const int per_value = 1;
   
-  Matrix_init(testMat, width, height);
-  Matrix_fill(testMat, in_value);
-  Matrix_fill_border(testMat, per_value);
-  
-  int testMax = Matrix_max(testMat);
-  ASSERT_EQUAL(testMax, in_value);
 
-  delete testMat;
-}
-
-TEST(test_Matrix_fill) {
-  Matrix *testMat = new Matrix;
-  Matrix *correctMat = new Matrix;
-  const int width = 2;
-  const int height = 2;
-  const int input_value = 2;
-
-  Matrix_init(testMat, width, height);
-  Matrix_init(correctMat, width, height);
-
-  Matrix_fill_border(correctMat, input_value);
-  Matrix_fill(testMat, input_value);
-  
-  ASSERT_TRUE(Matrix_equal(testMat, correctMat));
-  delete testMat;
-  delete correctMat;
-}
-
-TEST(Matrix_at) {
-  Matrix *testMat = new Matrix;
-
-  const int width = 3;
-  const int height = 3;
-  const int in_value = 2;
-  const int per_value = 1;
-  
-  Matrix_init(testMat, width, height);
-  Matrix_fill(testMat, in_value);
-  Matrix_fill_border(testMat, per_value);
-  
-  int* testAt = Matrix_at(testMat, 1, 1);
-  ASSERT_EQUAL(*(testAt), 2);
-
-  delete testMat;
-}
-
-TEST(edge_case_test_min_value_in_row){
-  Matrix *mat = new Matrix;
-
-  Matrix_init(mat, 5, 1);
-  Matrix_fill(mat, 2);
-
-  ASSERT_EQUAL(Matrix_min_value_in_row(mat, 0, 0, 4), 2);
-  delete mat;
-}
-
-TEST(edge_case_2_test_min_value_in_row){
-  Matrix *mat = new Matrix;
-
-  Matrix_init(mat, 5, 1);
-  Matrix_fill(mat, 2);
-
-  ASSERT_EQUAL(Matrix_max(mat), 2);
-  delete mat;
-}
-// NOTE: The unit test framework tutorial in Lab 2 originally
-// had a semicolon after TEST_MAIN(). Although including and
-// excluding the semicolon are both correct according to the c++
-// standard, the version of g++ we are using reports a warning
-// when there is a semicolon. Therefore do NOT add a semicolon
-// after TEST_MAIN()
 TEST_MAIN() // Do NOT put a semicolon here

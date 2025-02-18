@@ -126,8 +126,10 @@ void Image_set_pixel(Image* img, int row, int column, Pixel color) {
 // MODIFIES: *img
 // EFFECTS:  Sets each pixel in the image to the given color.
 void Image_fill(Image* img, Pixel color) {
-  for (int i = 0; i < img->height; i++) {
-    for (int j = 0; j < img->width; j++) {
+  int height = img->height;
+  int width = img->width;
+  for (int i = 0; i < height; i++) {
+    for (int j = 0; j < width; j++) {
       Image_set_pixel(img, i, j, color);
     }
   }

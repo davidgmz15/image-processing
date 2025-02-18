@@ -71,8 +71,10 @@ const int* Matrix_at(const Matrix* mat, int row, int column) {
 // MODIFIES: *mat
 // EFFECTS:  Sets each element of the Matrix to the given value.
 void Matrix_fill(Matrix* mat, int value) {
-  for (int i = 0; i < mat->height; i++) {
-    for (int j = 0; j < mat->width; j++) {
+  int height = mat->height;
+  int width = mat->width;
+  for (int i = 0; i < height; i++) {
+    for (int j = 0; j < width; j++) {
       *Matrix_at(mat, i, j) = value;
     }
   }
@@ -101,9 +103,11 @@ void Matrix_fill_border(Matrix* mat, int value) {
 // REQUIRES: mat points to a valid Matrix
 // EFFECTS:  Returns the value of the maximum element in the Matrix
 int Matrix_max(const Matrix* mat) {
+  int height = mat->height;
+  int width = mat->width;
   int add = *Matrix_at(mat, 0, 0);
-    for (int i = 0; i < mat->height; i++) {
-      for (int j = 0; j < mat->width; j++) {
+    for (int i = 0; i < height; i++) {
+      for (int j = 0; j < width; j++) {
         if (*Matrix_at(mat, i, j) > add) {
           add = *Matrix_at(mat, i, j);
       }

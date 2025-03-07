@@ -1,6 +1,6 @@
 Image Resizing Program
 ===========================
-Built sing a Seam-Carving Algorithm
+Built using a Seam-Carving Algorithm
 
 By David Gonzalez <davidgmz@umich.edu>
 
